@@ -1332,6 +1332,12 @@ Module common
             If myC.HeaderText.ToUpper = c.ToUpper Then myC.Visible = v : Exit For
         Next
     End Sub
+    ''' <summary>
+    ''' binds optional table to dropdown and selects existing value from this table. There are various bind options, see module
+    ''' </summary>
+    ''' <param name="oDD">dropdownlist</param>
+    ''' <param name="oTable">optional datatable to bind</param>
+    ''' <param name="sVal">override any existing selected oldV or oldT</param>
     <Extension()>
     Sub setDropDown(ByVal oDD As DropDownList, Optional ByVal oTable As DataTable = Nothing, Optional ByVal sVal As String = "")
         '*** 2014-11-17 modified to support optional 'bind' attribute on the DD, making it work same way as the doBindDataRow function
@@ -1526,7 +1532,6 @@ Module common
             '*** ignores ck setting.
 
             Dim myTB As TextBox = TryCast(getControlClone(id), TextBox)
-            If myTB IsNot Nothing Then myTB.Text = myTB.Text.sqlSafe.Trim
             Dim myDD As DropDownList = TryCast(getControlClone(id), DropDownList)
             Dim myCB As CheckBox = TryCast(getControlClone(id), CheckBox)
 
@@ -1575,11 +1580,11 @@ Module common
                 Case "ALL"
                     Return "%"
                 Case "CONTAINS"
-                    Return "%" & myTB.Text.sqlSafe & "%"
+                    Return "%" & myTB.Text & "%"
                 Case "BEGINS WITH"
-                    Return myTB.Text.sqlSafe & "%"
+                    Return myTB.Text & "%"
                 Case "ENDS WITH"
-                    Return "%" & myTB.Text.sqlSafe
+                    Return "%" & myTB.Text
                 Case Else
                     Return myDD.SelectedValue
             End Select
@@ -1651,7 +1656,14 @@ Module common
             If gv Is Nothing Then gv = _gv
             Dim sb As New StringBuilder
             sb.Append(oDA.SelectCommand.CommandText)
-            sb.Append(" WHERE ")
+            '*** 2022-10-31 bug fix, if the command already contains WHERE we will use AND instead
+            If oDA.SelectCommand.CommandText.Contains("WHERE") Then
+                sb.Append(" AND ")
+            Else
+                sb.Append(" WHERE ")
+            End If
+
+
             For i As Integer = 0 To sControlIDs.Count - 1
                 sb.Append(sFieldNames(i))
                 sb.Append(" LIKE @p")
