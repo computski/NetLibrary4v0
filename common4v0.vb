@@ -1629,6 +1629,7 @@ Module common
         ''' <summary>
         ''' Encapsulation method. Databinds all the filter dropdowns in the header row using distinct values in dt
         ''' Add ACBE='true' to the dropdown if you wish to add ALL,CONTAINS,BEFORE,ENDS to the options
+        ''' requires the dataValueField to be defined on the dropdown, else an error will result
         ''' </summary>
         ''' <param name="dt">datatable used as the gridview datasource. Optional if you called New() with a ref to the gridview AND subsequently bound a table to it</param>
         Sub bindAllDropdowns(Optional dt As DataTable = Nothing)
